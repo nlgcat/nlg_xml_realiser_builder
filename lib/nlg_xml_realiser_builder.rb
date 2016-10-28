@@ -9,6 +9,6 @@ module NlgXmlRealiserBuilder
   def self.test_post(text)
     uri = URI.parse("#{ENV['SERVICE_URL'] || 'http://nlg-service.herokuapp.com'}/api/realiser")
     response = Net::HTTP.post_form(uri, {"xml" => text})
-    puts response.body
+    response.body.strip
   end
 end

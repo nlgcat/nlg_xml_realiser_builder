@@ -7,19 +7,29 @@ module NlgXmlRealiserBuilder
         @xml = xml
         xml.NLGSpec('xmlns' => 'http://simplenlg.googlecode.com/svn/trunk/res/xml', 'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema', 'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance') {
           xml.Recording {
-            xml.Record {
-              instance_eval(&block) if block
-            }
+            instance_eval(&block) if block
           }
         }
       end
     end
 
-    def doc(category = 'PARAGRAPH', &block)
+    def record(name = nil, &block)
+      attributes = {}
+      attributes.merge(name: name) if name
+      @xml.Record(attributes) {
+        instance_eval(&block) if block
+      }
+    end
+
+    def doc(tag = :Document, options = {}, &block)
+      category = options.delete(:cat) || 'PARAGRAPH'
       unless Consts::DOCUMENT_CATEGORIES.include?(category)
         raise "Document category '#{category}' is not in [#{Consts::DOCUMENT_CATEGORIES.join(", ")}]"
       end
-      @xml.Document('cat' => category) {
+      attributes = {}
+      attributes.merge!('xsi:type' => 'DocumentElement') unless tag == :Document
+      attributes.merge!('cat' => category)
+      @xml.send(tag, attributes) {
         previous_call, @last_call = @last_call, 'Document'
         instance_eval(&block) if block
         @last_call = previous_call
@@ -39,7 +49,7 @@ module NlgXmlRealiserBuilder
       unless Consts::NLG_LEXICAL_CATEGORY.include?(cat)
         raise "Specifier category must be in [#{Consts::NLG_LEXICAL_CATEGORY.join(", ")}]"
       end
-      @xml.spec_('cat' => cat) {
+      @xml.spec_('xsi:type' => 'WordElement', 'cat' => cat) {
         @xml.base base
       }
     end

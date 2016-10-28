@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module NlgXmlRealiserBuilder
   module Consts
     DOCUMENT_CATEGORIES            = [ 'DOCUMENT', 'SECTION', 'PARAGRAPH', 'SENTENCE', 'LIST', 'ENUMERATED_LIST', 'LIST_ITEM'].freeze
@@ -55,7 +56,10 @@ module NlgXmlRealiserBuilder
                                 GENDER
                                 PERSON
                                 POSSESSIVE
-                                PRONOMINAL)
+                                PRONOMINAL
+                                cat
+                                discourseFunction
+                                appositive)
 
     ADJPHRASESPEC_ATTRIBUTES = %i(IS_COMPARATIVE IS_SUPERLATIVE)
 
@@ -193,6 +197,8 @@ module NlgXmlRealiserBuilder
       PROPER: NLG_BOOLEAN,
       var: NLG_INFLECTION,
       canned: NLG_BOOLEAN,
+      appositive: NLG_BOOLEAN,
+      discourseFunction: NLG_DISCOURSE_FUNCTION
     }
 
   end
