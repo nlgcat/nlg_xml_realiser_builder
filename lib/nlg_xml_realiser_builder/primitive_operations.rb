@@ -101,8 +101,8 @@ module NlgXmlRealiserBuilder
 
       results = options.keys.reject { |key|
         is_attribute_valid?( options[key], Consts::ATTRIBUTES[key] )
-      }.reduce([]) { |key|
-        results << "Attribute #{key} with value '#{options[key]}' should be in [#{Consts::ATTRIBUTES[key].join(", ")}]"
+      }.reduce([]) { |acc, key|
+        acc << "Attribute #{key} with value '#{options[key]}' should be in [#{Consts::ATTRIBUTES[key].join(", ")}]"
       }
 
       raise results.join("\n") unless results.empty?

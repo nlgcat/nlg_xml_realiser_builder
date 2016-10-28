@@ -82,6 +82,47 @@ describe NlgXmlRealiserBuilder do
     expect(xml_1).to eq(xml_2)
   end
 
+  it "testing passive past verb formation" do
+    xml_payload = dsl.builder(true) do
+      child :sp, MODAL: 'may', PASSIVE: true, TENSE: 'PAST' do
+        subj :np, ['the', 'child']
+        verb 'upset' do
+          compl :np, ['the', 'man']
+        end
+      end
+    end.to_xml
+
+    phrase = NlgXmlRealiserBuilder.test_post(xml_payload)
+    expect(phrase).to eq("The man may have been upset by the child.")
+  end
+
+  it "build a more real test", focus: true do
+    plural_example = -> (plural) {
+      dsl.builder(true) do
+        sp :child do
+          subj :np, 'there', cat: 'ADVERB'
+          verb 'be', PERSON: 'THIRD' do
+            compl :np, ['a', 'story'], NUMBER: plural  do
+              preMod :cp, conj: 'and' do
+                coord :vp, 'finish', TENSE: 'PAST'
+                coord :vp, 'deliver', TENSE: 'PAST'
+              end
+              compl :sp, MODAL: 'may', PASSIVE: true, TENSE: 'PAST' do
+                verb 'test', TENSE: 'PAST', NEGATED: true
+              end
+            end
+          end
+        end
+      end.to_xml
+    }
+
+    phrase = NlgXmlRealiserBuilder.test_post(plural_example.('PLURAL'))
+    expect(phrase).to eq("There are some finished and delivered stories that may not have been tested.")
+
+    phrase = NlgXmlRealiserBuilder.test_post(plural_example.('SINGULAR'))
+    expect(phrase).to eq("There is a finished and delivered story that may not have been tested.")
+  end
+
   it "renders a complete example of a NLGSpec" do
     expect(dsl.builder(true) do
       sp :child do
