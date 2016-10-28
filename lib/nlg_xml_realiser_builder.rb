@@ -1,5 +1,7 @@
 require "nlg_xml_realiser_builder/version"
 require "nlg_xml_realiser_builder/consts"
+require "nlg_xml_realiser_builder/primitive_operations"
+require "nlg_xml_realiser_builder/phrase_specs"
 require "nlg_xml_realiser_builder/dsl"
 require "nokogiri"
 require "net/http"

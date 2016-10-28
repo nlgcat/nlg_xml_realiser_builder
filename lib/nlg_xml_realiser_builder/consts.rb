@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 module NlgXmlRealiserBuilder
   module Consts
-    DOCUMENT_CATEGORIES            = [ 'DOCUMENT', 'SECTION', 'PARAGRAPH', 'SENTENCE', 'LIST', 'ENUMERATED_LIST', 'LIST_ITEM'].freeze
-    DOCUMENT_ELEMENTS              = %i(child)
-    SPHRASESPEC_ELEMENTS           = %i(cuePhrase subj vp)
-    PHRASE_ELEMENTS                = %i(frontMod preMod compl postMod head)
-    VPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS
-    NPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS + [ :spec ]
-    ADJPHRASESPEC_ELEMENTS         = PHRASE_ELEMENTS
-    ADVPHRASESPEC_ELEMENTS         = PHRASE_ELEMENTS
-    PPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS
-    COORDINATEDPHRASEELEMENT_ELEMENTS = [ :coord ]
+    XML_SCHEMA = {
+      'xmlns'     => 'http://simplenlg.googlecode.com/svn/trunk/res/xml',
+      'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
+      'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'}.freeze
+
+    DOCUMENT_CATEGORIES = %w(DOCUMENT
+        SECTION
+        PARAGRAPH
+        SENTENCE
+        LIST
+        ENUMERATED_LIST
+        LIST_ITEM).freeze
 
     PHRASE_SPEC_TYPES = %w(SPhraseSpec
       VPPhraseSpec
@@ -21,7 +23,22 @@ module NlgXmlRealiserBuilder
       CoordinatedPhraseElement
       PhraseElement
       StringElement
-      WordElement)
+      WordElement).freeze
+
+    # What elements does each phrase spec type accepts
+
+    DOCUMENTELEMENT_ELEMENTS       = %i(child).freeze
+    SPHRASESPEC_ELEMENTS           = %i(cuePhrase subj vp).freeze
+    PHRASE_ELEMENTS                = %i(frontMod preMod compl postMod head).freeze
+
+    VPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS
+    NPPHRASESPEC_ELEMENTS          = ( PHRASE_ELEMENTS + [ :spec ] ).freeze
+    ADJPHRASESPEC_ELEMENTS         = PHRASE_ELEMENTS
+    ADVPHRASESPEC_ELEMENTS         = PHRASE_ELEMENTS
+    PPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS
+    COORDINATEDPHRASEELEMENT_ELEMENTS = [ :coord ].freeze
+
+    # What attributes does each phrase spec type accepts
 
     SPHRASESPEC_ATTRIBUTES = %i(AGGREGATE_AUXILIARY
                                 CLAUSE_STATUS
@@ -36,7 +53,7 @@ module NlgXmlRealiserBuilder
                                 PROGRESSIVE
                                 SUPPRESS_GENITIVE_IN_GERUND
                                 SUPRESSED_COMPLEMENTISER
-                                TENSE)
+                                TENSE).freeze
 
     VPPHRASESPEC_ATTRIBUTES = %i(AGGREGATE_AUXILIARY
                                 FORM
@@ -48,7 +65,7 @@ module NlgXmlRealiserBuilder
                                 PROGRESSIVE
                                 SUPPRESS_GENITIVE_IN_GERUND
                                 SUPRESSED_COMPLEMENTISER
-                                TENSE)
+                                TENSE).freeze
 
     NPPHRASESPEC_ATTRIBUTES = %i(ADJECTIVE_ORDERING
                                 ELIDED
@@ -59,13 +76,13 @@ module NlgXmlRealiserBuilder
                                 PRONOMINAL
                                 cat
                                 discourseFunction
-                                appositive)
+                                appositive).freeze
 
-    ADJPHRASESPEC_ATTRIBUTES = %i(IS_COMPARATIVE IS_SUPERLATIVE)
+    ADJPHRASESPEC_ATTRIBUTES = %i(IS_COMPARATIVE IS_SUPERLATIVE).freeze
 
-    ADVPHRASESPEC_ATTRIBUTES = []
+    ADVPHRASESPEC_ATTRIBUTES = [].freeze
 
-    PPPHRASESPEC_ATTRIBUTES = []
+    PPPHRASESPEC_ATTRIBUTES  = [].freeze
 
     COORDINATEDPHRASEELEMENT_ATTRIBUTES = %i(conj
                                 cat
@@ -79,15 +96,16 @@ module NlgXmlRealiserBuilder
                                 PROGRESSIVE
                                 RAISE_SPECIFIER
                                 SUPRESSED_COMPLEMENTISER
-                                TENSE)
+                                TENSE).freeze
 
     WORDELEMENT_ATTRIBUTES = %i(cat
                                id
                                EXPLETIVE_SUBJECT
                                PROPER
                                var
-                               canned)
+                               canned).freeze
 
+    # What primitive values does each kind of attribute accepts
 
     NLG_PHRASE_CATEGORY = %w(CLAUSE
       ADJECTIVE_PHRASE
@@ -95,7 +113,7 @@ module NlgXmlRealiserBuilder
       NOUN_PHRASE
       PREPOSITIONAL_PHRASE
       VERB_PHRASE
-      CANNED_TEXT)
+      CANNED_TEXT).freeze
 
     NLG_LEXICAL_CATEGORY = %w(ANY
       SYMBOL
@@ -109,11 +127,11 @@ module NlgXmlRealiserBuilder
       PREPOSITION
       COMPLEMENTISER
       MODAL
-      AUXILIARY)
+      AUXILIARY).freeze
 
-    NLG_TENSE = %w(FUTURE PAST PRESENT)
+    NLG_TENSE = %w(FUTURE PAST PRESENT).freeze
 
-    NLG_CLAUSE_STATUS = %w(MATRIX SUBORDINATE)
+    NLG_CLAUSE_STATUS = %w(MATRIX SUBORDINATE).freeze
 
     NLG_DISCOURSE_FUNCTION = %w(AUXILIARY
       COMPLEMENT
@@ -127,7 +145,7 @@ module NlgXmlRealiserBuilder
       POST_MODIFIER
       SPECIFIER
       SUBJECT
-      VERB_PHRASE)
+      VERB_PHRASE).freeze
 
     NLG_FORM = %w(BARE_INFINITIVE
       GERUND
@@ -135,13 +153,13 @@ module NlgXmlRealiserBuilder
       INFINITIVE
       NORMAL
       PAST_PARTICIPLE
-      PRESENT_PARTICIPLE)
+      PRESENT_PARTICIPLE).freeze
 
-    NLG_GENDER = %w(MASCULINE FEMININE NEUTER)
+    NLG_GENDER = %w(MASCULINE FEMININE NEUTER).freeze
 
-    NLG_NUMBER_AGREEMENT = %w(BOTH PLURAL SINGULAR)
+    NLG_NUMBER_AGREEMENT = %w(BOTH PLURAL SINGULAR).freeze
 
-    NLG_PERSON = %w(FIRST SECOND THIRD)
+    NLG_PERSON = %w(FIRST SECOND THIRD).freeze
 
     NLG_INTERROGATIVE_TYPE = %w(HOW
       WHAT_OBJECT
@@ -151,55 +169,55 @@ module NlgXmlRealiserBuilder
       WHO_OBJECT
       WHO_SUBJECT
       WHY
-      YES_NO)
+      YES_NO).freeze
 
     NLG_INFLECTION = %w(GRECO_LATIN_REGULAR
       IRREGULAR
       REGULAR
       REGULAR_DOUBLE
       UNCOUNT
-      INVARIANT)
+      INVARIANT).freeze
 
-    NLG_BOOLEAN = [true, false]
+    NLG_BOOLEAN = [true, false].freeze
 
     ATTRIBUTES = {
-      AGGREGATE_AUXILIARY: NLG_BOOLEAN,
-      CLAUSE_STATUS: NLG_CLAUSE_STATUS,
-      COMPLEMENTISER: String,
-      FORM: NLG_FORM,
-      INTERROGATIVE_TYPE: NLG_INTERROGATIVE_TYPE,
-      MODAL: String,
-      NEGATED: NLG_BOOLEAN,
-      PASSIVE: NLG_BOOLEAN,
-      PERFECT: NLG_BOOLEAN,
-      PERSON: NLG_PERSON,
-      PROGRESSIVE: NLG_BOOLEAN,
-      SUPPRESS_GENITIVE_IN_GERUND: NLG_BOOLEAN,
-      SUPRESSED_COMPLEMENTISER: NLG_BOOLEAN,
-      TENSE: NLG_TENSE,
-      ADJECTIVE_ORDERING: NLG_BOOLEAN,
-      ELIDED: NLG_BOOLEAN,
-      NUMBER: NLG_NUMBER_AGREEMENT,
-      GENDER: NLG_GENDER,
-      POSSESSIVE: NLG_BOOLEAN,
-      PRONOMINAL: NLG_BOOLEAN,
-      IS_COMPARATIVE: NLG_BOOLEAN,
-      IS_SUPERLATIVE: NLG_BOOLEAN,
-      conj: String,
-      cat: NLG_PHRASE_CATEGORY + NLG_LEXICAL_CATEGORY,
-      APPOSITIVE: NLG_BOOLEAN,
-      CONJUNCTION_TYPE: String,
-      RAISE_SPECIFIER: NLG_BOOLEAN,
-      val: String,
-      base: String,
-      id: String,
-      EXPLETIVE_SUBJECT: NLG_BOOLEAN,
-      PROPER: NLG_BOOLEAN,
-      var: NLG_INFLECTION,
-      canned: NLG_BOOLEAN,
-      appositive: NLG_BOOLEAN,
-      discourseFunction: NLG_DISCOURSE_FUNCTION
-    }
+      ADJECTIVE_ORDERING:            NLG_BOOLEAN,
+      AGGREGATE_AUXILIARY:           NLG_BOOLEAN,
+      APPOSITIVE:                    NLG_BOOLEAN,
+      CLAUSE_STATUS:                 NLG_CLAUSE_STATUS,
+      COMPLEMENTISER:                String,
+      CONJUNCTION_TYPE:              String,
+      ELIDED:                        NLG_BOOLEAN,
+      EXPLETIVE_SUBJECT:             NLG_BOOLEAN,
+      FORM:                          NLG_FORM,
+      GENDER:                        NLG_GENDER,
+      INTERROGATIVE_TYPE:            NLG_INTERROGATIVE_TYPE,
+      IS_COMPARATIVE:                NLG_BOOLEAN,
+      IS_SUPERLATIVE:                NLG_BOOLEAN,
+      MODAL:                         String,
+      NEGATED:                       NLG_BOOLEAN,
+      NUMBER:                        NLG_NUMBER_AGREEMENT,
+      PASSIVE:                       NLG_BOOLEAN,
+      PERFECT:                       NLG_BOOLEAN,
+      PERSON:                        NLG_PERSON,
+      POSSESSIVE:                    NLG_BOOLEAN,
+      PROGRESSIVE:                   NLG_BOOLEAN,
+      PRONOMINAL:                    NLG_BOOLEAN,
+      PROPER:                        NLG_BOOLEAN,
+      RAISE_SPECIFIER:               NLG_BOOLEAN,
+      SUPPRESS_GENITIVE_IN_GERUND:   NLG_BOOLEAN,
+      SUPRESSED_COMPLEMENTISER:      NLG_BOOLEAN,
+      TENSE:                         NLG_TENSE,
+      appositive:                    NLG_BOOLEAN,
+      base:                          String,
+      canned:                        NLG_BOOLEAN,
+      cat:                           ( NLG_PHRASE_CATEGORY + NLG_LEXICAL_CATEGORY ).freeze,
+      conj:                          String,
+      discourseFunction:             NLG_DISCOURSE_FUNCTION,
+      id:                            String,
+      val:                           String,
+      var:                           NLG_INFLECTION,
+    }.freeze
 
   end
 end
