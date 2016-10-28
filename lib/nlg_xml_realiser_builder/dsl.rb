@@ -1,196 +1,6 @@
 # frozen_string_literal: true
 module NlgXmlRealiserBuilder
   class DSL
-    DOCUMENT_CATEGORIES            = [ 'DOCUMENT', 'SECTION', 'PARAGRAPH', 'SENTENCE', 'LIST', 'ENUMERATED_LIST', 'LIST_ITEM'].freeze
-    DOCUMENT_ELEMENTS              = %i(child)
-    SPHRASESPEC_ELEMENTS           = %i(cuePhrase subj vp)
-    PHRASE_ELEMENTS                = %i(frontMod preMod compl postMod head)
-    VPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS
-    NPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS + [ :spec ]
-    ADJPHRASESPEC_ELEMENTS         = PHRASE_ELEMENTS
-    ADVPHRASESPEC_ELEMENTS         = PHRASE_ELEMENTS
-    PPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS
-    COORDINATEDPHRASEELEMENT_ELEMENTS = [ :coord ]
-
-    PHRASE_SPEC_TYPES = %w(SPhraseSpec
-      VPPhraseSpec
-      NPPhraseSpec
-      AdjPhraseSpec
-      AdvPhraseSpec
-      PPPhraseSpec
-      CoordinatedPhraseElement
-      PhraseElement
-      StringElement
-      WordElement)
-
-    SPHRASESPEC_ATTRIBUTES = %i(AGGREGATE_AUXILIARY
-                                CLAUSE_STATUS
-                                COMPLEMENTISER
-                                FORM
-                                INTERROGATIVE_TYPE
-                                MODAL
-                                NEGATED
-                                PASSIVE
-                                PERFECT
-                                PERSON
-                                PROGRESSIVE
-                                SUPPRESS_GENITIVE_IN_GERUND
-                                SUPRESSED_COMPLEMENTISER
-                                TENSE)
-
-    VPPHRASESPEC_ATTRIBUTES = %i(AGGREGATE_AUXILIARY
-                                FORM
-                                MODAL
-                                NEGATED
-                                PASSIVE
-                                PERFECT
-                                PERSON
-                                PROGRESSIVE
-                                SUPPRESS_GENITIVE_IN_GERUND
-                                SUPRESSED_COMPLEMENTISER
-                                TENSE)
-
-    NPPHRASESPEC_ATTRIBUTES = %i(ADJECTIVE_ORDERING
-                                ELIDED
-                                NUMBER
-                                GENDER
-                                PERSON
-                                POSSESSIVE
-                                PRONOMINAL)
-
-    ADJPHRASESPEC_ATTRIBUTES = %i(IS_COMPARATIVE IS_SUPERLATIVE)
-
-    ADVPHRASESPEC_ATTRIBUTES = []
-
-    COORDINATEDPHRASESPEC_ATTRIBUTES = %i(conj
-                                cat
-                                APPOSITIVE
-                                CONJUNCTION_TYPE
-                                MODAL
-                                NEGATED
-                                NUMBER
-                                PERSON
-                                POSSESSIVE
-                                PROGRESSIVE
-                                RAISE_SPECIFIER
-                                SUPRESSED_COMPLEMENTISER
-                                TENSE)
-
-    WORDELEMENT_ATTRIBUTES = %i(cat
-                               id
-                               EXPLETIVE_SUBJECT
-                               PROPER
-                               var
-                               canned)
-
-
-    NLG_PHRASE_CATEGORY = %w(CLAUSE
-      ADJECTIVE_PHRASE
-      ADVERB_PHRASE
-      NOUN_PHRASE
-      PREPOSITIONAL_PHRASE
-      VERB_PHRASE
-      CANNED_TEXT)
-
-    NLG_LEXICAL_CATEGORY = %w(ANY
-      SYMBOL
-      NOUN
-      ADJECTIVE
-      ADVERB
-      VERB
-      DETERMINER
-      PRONOUN
-      CONJUNCTION
-      PREPOSITION
-      COMPLEMENTISER
-      MODAL
-      AUXILIARY)
-
-    NLG_TENSE = %w(FUTURE PAST PRESENT)
-
-    NLG_CLAUSE_STATUS = %w(MATRIX SUBORDINATE)
-
-    NLG_DISCOURSE_FUNCTION = %w(AUXILIARY
-      COMPLEMENT
-      CONJUNCTION
-      CUE_PHRASE
-      FRONT_MODIFIER
-      HEAD
-      INDIRECT_OBJECT
-      OBJECT
-      PRE_MODIFIER
-      POST_MODIFIER
-      SPECIFIER
-      SUBJECT
-      VERB_PHRASE)
-
-    NLG_FORM = %w(BARE_INFINITIVE
-      GERUND
-      IMPERATIVE
-      INFINITIVE
-      NORMAL
-      PAST_PARTICIPLE
-      PRESENT_PARTICIPLE)
-
-    NLG_GENDER = %w(MASCULINE FEMININE NEUTER)
-
-    NLG_NUMBER_AGREEMENT = %w(BOTH PLURAL SINGULAR)
-
-    NLG_PERSON = %w(FIRST SECOND THIRD)
-
-    NLG_INTERROGATIVE_TYPE = %w(HOW
-      WHAT_OBJECT
-      WHAT_SUBJECT
-      WHERE
-      WHO_INDIRECT_OBJECT
-      WHO_OBJECT
-      WHO_SUBJECT
-      WHY
-      YES_NO)
-
-    NLG_INFLECTION = %w(GRECO_LATIN_REGULAR
-      IRREGULAR
-      REGULAR
-      REGULAR_DOUBLE
-      UNCOUNT
-      INVARIANT)
-
-    ATTRIBUTES = {
-      AGGREGATE_AUXILIARY: [TrueClass, FalseClass],
-      CLAUSE_STATUS: NLG_CLAUSE_STATUS,
-      COMPLEMENTISER: String,
-      FORM: NLG_FORM,
-      INTERROGATIVE_TYPE: NLG_INTERROGATIVE_TYPE,
-      MODAL: String,
-      NEGATED: [TrueClass, FalseClass],
-      PASSIVE: [TrueClass, FalseClass],
-      PERFECT: [TrueClass, FalseClass],
-      PERSON: NLG_PERSON,
-      PROGRESSIVE: [TrueClass, FalseClass],
-      SUPPRESS_GENITIVE_IN_GERUND: [TrueClass, FalseClass],
-      SUPRESSED_COMPLEMENTISER: [TrueClass, FalseClass],
-      TENSE: NLG_TENSE,
-      ADJECTIVE_ORDERING: [TrueClass, FalseClass],
-      ELIDED: [TrueClass, FalseClass],
-      NUMBER: NLG_NUMBER_AGREEMENT,
-      GENDER: NLG_GENDER,
-      POSSESSIVE: [TrueClass, FalseClass],
-      PRONOMINAL: [TrueClass, FalseClass],
-      IS_COMPARATIVE: [TrueClass, FalseClass],
-      IS_SUPERLATIVE: [TrueClass, FalseClass],
-      conj: String,
-      cat: [ NLG_PHRASE_CATEGORY, NLG_LEXICAL_CATEGORY ],
-      APPOSITIVE: [TrueClass, FalseClass],
-      CONJUNCTION_TYPE: String,
-      RAISE_SPECIFIER: [TrueClass, FalseClass],
-      val: String,
-      base: String,
-      id: String,
-      EXPLETIVE_SUBJECT: [TrueClass, FalseClass],
-      PROPER: [TrueClass, FalseClass],
-      var: NLG_INFLECTION,
-      canned: [TrueClass, FalseClass],
-    }
 
     def builder(&block)
       Nokogiri::XML::Builder.new do |xml|
@@ -206,8 +16,8 @@ module NlgXmlRealiserBuilder
     end
 
     def doc(category = 'PARAGRAPH', &block)
-      unless DOCUMENT_CATEGORIES.include?(category)
-        raise "Document category '#{category}' is not in [#{DOCUMENT_CATEGORIES.join(", ")}]"
+      unless Consts::DOCUMENT_CATEGORIES.include?(category)
+        raise "Document category '#{category}' is not in [#{Consts::DOCUMENT_CATEGORIES.join(", ")}]"
       end
       @xml.Document('cat' => category) {
         previous_call, @last_call = @last_call, 'Document'
@@ -217,8 +27,8 @@ module NlgXmlRealiserBuilder
     end
 
     private def head(base, cat = 'NOUN')
-      unless NLG_LEXICAL_CATEGORY.include?(cat)
-        raise "Head category '#{cat}' is not in [#{NLG_LEXICAL_CATEGORY.join(", ")}]"
+      unless Consts::NLG_LEXICAL_CATEGORY.include?(cat)
+        raise "Head category '#{cat}' is not in [#{Consts::NLG_LEXICAL_CATEGORY.join(", ")}]"
       end
       @xml.head('cat' => cat) {
         @xml.base base
@@ -226,8 +36,8 @@ module NlgXmlRealiserBuilder
     end
 
     private def spec(base, cat = 'DETERMINER')
-      unless NLG_LEXICAL_CATEGORY.include?(cat)
-        raise "Specifier category must be in [#{NLG_LEXICAL_CATEGORY.join(", ")}]"
+      unless Consts::NLG_LEXICAL_CATEGORY.include?(cat)
+        raise "Specifier category must be in [#{Consts::NLG_LEXICAL_CATEGORY.join(", ")}]"
       end
       @xml.spec_('cat' => cat) {
         @xml.base base
@@ -235,35 +45,60 @@ module NlgXmlRealiserBuilder
     end
 
     private def validate_element!(tag)
-      elements = NlgXmlRealiserBuilder::DSL.const_get("#{@last_call.upcase}_ELEMENTS".to_sym)
+      elements = Consts.const_get("#{@last_call.upcase}_ELEMENTS".to_sym)
       unless elements.include?(tag)
         raise "Element #{tag} is now allowed within #{@last_call}. Must be in [#{elements.join(', ')}]"
       end
     end
 
     private def validate_spec_type!(spec_type)
-      unless PHRASE_SPEC_TYPES.include?(spec_type)
-        raise "There is no '#{spec_type}' in [#{PHRASE_SPEC_TYPES.join(", ")}]"
+      unless Consts::PHRASE_SPEC_TYPES.include?(spec_type)
+        raise "There is no '#{spec_type}' in [#{Consts::PHRASE_SPEC_TYPES.join(", ")}]"
+      end
+    end
+
+    private def validate_attributes!(options = {}, spec_type)
+      valid_attributes = Consts.const_get("#{spec_type.upcase}_ATTRIBUTES")
+      invalid_attributes = options.keys - valid_attributes
+      unless invalid_attributes.empty?
+        raise "Attributes [#{invalid_attributes.join(", ")}] are invalid for #{spec_type} which only allows [#{valid_attributes.join(", ")}]"
+      end
+      results = []
+      options.keys.each do |key|
+        valid = if Consts::ATTRIBUTES[key].is_a? Array
+                  Consts::ATTRIBUTES[key].include? options[key]
+                else
+                  options[key].is_a? Consts::ATTRIBUTES[key]
+                end
+        unless valid
+          results << "Attribute #{key} with value '#{options[key]}' should be in [#{ATTRIBUTES[key].join(", ")}]"
+        end
+      end
+
+      unless results.empty?
+        raise results.join("\n")
       end
     end
 
     private def abstract_spec(spec_type, tag, options = {}, block)
       validate_element! tag
       validate_spec_type! spec_type
+      validate_attributes! options, spec_type
 
       attributes = { 'xsi:type' => spec_type }
       attributes.merge!(options) if options && !options.empty?
 
       @xml.send(tag, attributes) {
         yield if block_given?
+
         previous_call, @last_call = @last_call, spec_type
         instance_eval(&block) if block
         @last_call = previous_call
       }
     end
 
-    def sp(tag = :child, verb = nil, options = {}, &block)
-      abstract_spec('SPhraseSpec', tag, nil, block)
+    def sp(tag = :child, options = {}, &block)
+      abstract_spec('SPhraseSpec', tag, options, block)
     end
 
     def np(tag = :subj, noun = nil, options = {}, &block)
@@ -286,6 +121,12 @@ module NlgXmlRealiserBuilder
     def adj(tag = :coord, adjective = nil, options = {}, &block)
       abstract_spec('AdjPhraseSpec', tag, options, block) do
         head(adjective, 'ADJECTIVE') if adjective
+      end
+    end
+
+    def adv(tag = :coord, adverb = nil, options = {}, &block)
+      abstract_spec('AdvPhraseSpec', tag, options, block) do
+        head(adjective, 'ADVERB') if adjective
       end
     end
 
