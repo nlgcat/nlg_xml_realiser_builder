@@ -40,37 +40,34 @@ Example:
 
 ```
 dsl = NlgXmlRealiserBuilder::DSL.new
-dsl.builder {
-  doc {
-    sp( :child ) {
-      np( :subj, 'there', cat: 'ADVERB' )
-      vp( :vp, 'be' ) {
-        np( :compl, [ 'a', 'restenosis' ] ) {
-          cp( :preMod ) {
-            adj( :coord, 'eccentric' )
-            adj( :coord, 'tubular' )
-          }
-          str( :postMod, '(18 mm x 1 mm)' )
-        }
-        pp( :postMod, 'from') {
-          vp( :preMod, 'extend', FORM: 'GERUND')
-          np( :compl, ['the'] ) {
-            adj( :preMod, 'proximal' )
-          }
-          pp( :postMod, 'to' ) {
-            np( :compl, [ 'a', 'right coronary artery' ] ) {
-              adj( :preMod, 'mid' )
-            }
-          }
-        }
-        pp( :postMod, 'with' ) {
-          np( :compl, 'TIMI 1 flow' )
-        }
-      }
-    }
-  }
-}.to_xml
-
+dsl.builder(true) do
+  sp :child do
+    subj :np, 'there', cat: 'ADVERB'
+    verb 'be' do
+      compl [ 'a', 'restenosis' ] do
+        preMod :cp, conj: ',' do
+          coord :adj, 'eccentric'
+          coord :adj, 'tubular'
+        end
+        postMod :str, '(18 mm x 1 mm)'
+      end
+      postMod :pp, 'from' do
+        preMod :vp, 'extend', FORM: 'GERUND'
+        compl ['the'] do
+          preMod :adj, 'proximal'
+        end
+        postMod :pp, 'to' do
+          compl [ 'a', 'right coronary artery' ] do
+            preMod :adj, 'mid'
+          end
+        end
+      end
+      postMod :pp, 'with' do
+        compl :np, 'TIMI 1 flow'
+      end
+    end
+  end
+end.to_xml
 ```
 
 Resulting XML:
@@ -178,12 +175,24 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+You can use the NLG Web Service from the `bin/console` using:
+
+```
+NlgXmlRealiserBuilder.test_post(builder.to_xml)
+```
+
+It should return a properly realised English phrase.
+
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/Codeminer42/nlg_xml_realiser_builder.
 
 
 ## License
+
+Author: Fabio Akita
+Copyright 2016 (C) Codeminer 42
 
 The gem is available as open source under the terms of the [LGPL-3.0 License](https://opensource.org/licenses/LGPL-3.0).
 

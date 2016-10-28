@@ -19,8 +19,8 @@ describe NlgXmlRealiserBuilder do
     EOF
   end
 
-  it "renders a complete example of a NLGSpec" do
-    expect(dsl.builder(true) {
+  it "both normal and inverted syntax should render the same XML" do
+    xml_1 = dsl.builder(true) do
       sp :child do
         subj :np, 'there', cat: 'ADVERB'
         verb 'be' do
@@ -47,7 +47,70 @@ describe NlgXmlRealiserBuilder do
           end
         end
       end
-    }.to_xml).to eq(<<-EOF)
+    end.to_xml
+
+    dsl_2 = NlgXmlRealiserBuilder::DSL.new
+    xml_2 = dsl_2.builder(true) do
+      sp :child do
+        np :subj, 'there', cat: 'ADVERB'
+        vp :vp, 'be' do
+          np :compl, [ 'a', 'restenosis' ] do
+            cp :preMod, conj: ',' do
+              adj :coord, 'eccentric'
+              adj :coord, 'tubular'
+            end
+            str :postMod, '(18 mm x 1 mm)'
+          end
+          pp :postMod, 'from' do
+            vp :preMod, 'extend', FORM: 'GERUND'
+            np :compl, ['the'] do
+              adj :preMod, 'proximal'
+            end
+            pp :postMod, 'to' do
+              np :compl, [ 'a', 'right coronary artery' ] do
+                adj :preMod, 'mid'
+              end
+            end
+          end
+          pp :postMod, 'with' do
+            np :compl, 'TIMI 1 flow'
+          end
+        end
+      end
+    end.to_xml
+
+    expect(xml_1).to eq(xml_2)
+  end
+
+  it "renders a complete example of a NLGSpec" do
+    expect(dsl.builder(true) do
+      sp :child do
+        subj :np, 'there', cat: 'ADVERB'
+        verb 'be' do
+          compl [ 'a', 'restenosis' ] do
+            preMod :cp, conj: ',' do
+              coord :adj, 'eccentric'
+              coord :adj, 'tubular'
+            end
+            postMod :str, '(18 mm x 1 mm)'
+          end
+          postMod :pp, 'from' do
+            preMod :vp, 'extend', FORM: 'GERUND'
+            compl ['the'] do
+              preMod :adj, 'proximal'
+            end
+            postMod :pp, 'to' do
+              compl [ 'a', 'right coronary artery' ] do
+                preMod :adj, 'mid'
+              end
+            end
+          end
+          postMod :pp, 'with' do
+            compl :np, 'TIMI 1 flow'
+          end
+        end
+      end
+    end.to_xml).to eq(<<-EOF)
 <?xml version="1.0"?>
 <NLGSpec xmlns="http://simplenlg.googlecode.com/svn/trunk/res/xml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Recording>
@@ -144,19 +207,15 @@ describe NlgXmlRealiserBuilder do
   end
 
   it "renders the XMLRealiserParameterizedTests appositive test" do
-    xml_payload = dsl.builder {
-      record {
-        doc {
-          sp(:child, PASSIVE: true) {
-            vp(:vp, 'deploy', TENSE: 'PAST') {
-              np(:compl, ['a', 'angioplasty balloon catheter']) {
-                np(:postMod, ['the', 'D701000000992'], appositive: true)
-              }
-            }
-          }
-        }
-      }
-    }.to_xml
+    xml_payload = dsl.builder(true) do
+      child :sp, PASSIVE: true do
+        verb 'deploy', TENSE: 'PAST' do
+          compl ['a', 'angioplasty balloon catheter'] do
+            postMod ['the', 'D701000000992'], appositive: true
+          end
+        end
+      end
+    end.to_xml
 
     expect(xml_payload).to eq(<<-EOF)
 <?xml version="1.0"?>

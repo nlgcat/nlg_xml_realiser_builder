@@ -89,11 +89,7 @@ module NlgXmlRealiserBuilder
     end
 
     private def is_attribute_valid?(value, validation)
-      if validation.is_a? Array
-        validation.include? value
-      else
-        value.is_a? validation
-      end
+      validation.is_a?(Array) ? validation.include?(value) : value.is_a?(validation)
     end
 
     private def validate_attributes!(options = {}, spec_type)
@@ -103,15 +99,13 @@ module NlgXmlRealiserBuilder
         raise "Attributes [#{invalid_attributes.join(", ")}] are invalid for #{spec_type} which only allows [#{valid_attributes.join(", ")}]"
       end
 
-      results = []
-      options.keys.each do |key|
-        next if is_attribute_valid? options[key], Consts::ATTRIBUTES[key]
-        results << "Attribute #{key} with value '#{options[key]}' should be in [#{ATTRIBUTES[key].join(", ")}]"
-      end
+      results = options.keys.reject { |key|
+        is_attribute_valid?( options[key], Consts::ATTRIBUTES[key] )
+      }.reduce([]) { |key|
+        results << "Attribute #{key} with value '#{options[key]}' should be in [#{Consts::ATTRIBUTES[key].join(", ")}]"
+      }
 
-      unless results.empty?
-        raise results.join("\n")
-      end
+      raise results.join("\n") unless results.empty?
     end
 
     private def abstract_spec(spec_type, tag, options = {}, block)
@@ -124,7 +118,6 @@ module NlgXmlRealiserBuilder
 
       @xml.send(tag, attributes) {
         yield if block_given?
-
         nlg_eval(spec_type, &block)
       }
     end
