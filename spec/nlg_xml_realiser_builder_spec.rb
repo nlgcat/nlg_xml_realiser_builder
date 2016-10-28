@@ -7,46 +7,46 @@ describe NlgXmlRealiserBuilder do
   end
 
   it "renders the root level structure" do
-    expect(dsl.builder.to_xml).to eq(<<-EOF)
+    expect(dsl.builder(true).to_xml).to eq(<<-EOF)
 <?xml version="1.0"?>
 <NLGSpec xmlns="http://simplenlg.googlecode.com/svn/trunk/res/xml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Recording/>
+  <Recording>
+    <Record>
+      <Document cat="PARAGRAPH"/>
+    </Record>
+  </Recording>
 </NLGSpec>
     EOF
   end
 
   it "renders a complete example of a NLGSpec" do
-    expect(dsl.builder {
-      record {
-        doc {
-          sp( :child ) {
-            np( :subj, 'there', cat: 'ADVERB' )
-            vp( :vp, 'be' ) {
-              np( :compl, [ 'a', 'restenosis' ] ) {
-                cp( :preMod ) {
-                  adj( :coord, 'eccentric' )
-                  adj( :coord, 'tubular' )
-                }
-                str( :postMod, '(18 mm x 1 mm)' )
-              }
-              pp( :postMod, 'from') {
-                vp( :preMod, 'extend', FORM: 'GERUND')
-                np( :compl, ['the'] ) {
-                  adj( :preMod, 'proximal' )
-                }
-                pp( :postMod, 'to' ) {
-                  np( :compl, [ 'a', 'right coronary artery' ] ) {
-                    adj( :preMod, 'mid' )
-                  }
-                }
-              }
-              pp( :postMod, 'with' ) {
-                np( :compl, 'TIMI 1 flow' )
-              }
-            }
-          }
-        }
-      }
+    expect(dsl.builder(true) {
+      sp :child do
+        subj :np, 'there', cat: 'ADVERB'
+        verb 'be' do
+          compl [ 'a', 'restenosis' ] do
+            preMod :cp, conj: ',' do
+              coord :adj, 'eccentric'
+              coord :adj, 'tubular'
+            end
+            postMod :str, '(18 mm x 1 mm)'
+          end
+          postMod :pp, 'from' do
+            preMod :vp, 'extend', FORM: 'GERUND'
+            compl ['the'] do
+              preMod :adj, 'proximal'
+            end
+            postMod :pp, 'to' do
+              compl [ 'a', 'right coronary artery' ] do
+                preMod :adj, 'mid'
+              end
+            end
+          end
+          postMod :pp, 'with' do
+            compl :np, 'TIMI 1 flow'
+          end
+        end
+      end
     }.to_xml).to eq(<<-EOF)
 <?xml version="1.0"?>
 <NLGSpec xmlns="http://simplenlg.googlecode.com/svn/trunk/res/xml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -208,11 +208,11 @@ describe NlgXmlRealiserBuilder do
       record("Lexical and spelling variants") {
         doc {
           sp(:child) {
-            np(:subj, ['the', 'patient'])
-            vp(:vp, 'lie', TENSE: 'PAST') {
-              vp(:postMod, 'etherise', TENSE: 'PAST') {
-                pp(:postMod, 'upon') {
-                  np(:compl, ['a', 'table'])
+            subj(['the', 'patient'])
+            verb('lie', TENSE: 'PAST') {
+              postMod(:vp, 'etherise', TENSE: 'PAST') {
+                postMod(:pp, 'upon') {
+                  compl(:np, ['a', 'table'])
                 }
               }
             }
@@ -230,18 +230,18 @@ describe NlgXmlRealiserBuilder do
         }
       }
       record("aAn8Test") {
-        doc(:Document, cat: 'LIST') {
-          doc(:child, cat: 'LIST_ITEM') {
-            cp(:child, conj: 'but') {
-              np(:coord, ['a', 'thing']) {
+        list {
+          item {
+            child(:cp, conj: 'but') {
+              coord(:np, ['a', 'thing']) {
                 str(:preMod, '18')
               }
-              np(:coord, ['a', 'thing']) {
+              coord(:np, ['a', 'thing']) {
                 str(:preMod, '180')
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '18x')
@@ -251,7 +251,7 @@ describe NlgXmlRealiserBuilder do
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '11g')
@@ -261,7 +261,7 @@ describe NlgXmlRealiserBuilder do
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '8th')
@@ -271,7 +271,7 @@ describe NlgXmlRealiserBuilder do
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '11th')
@@ -281,7 +281,7 @@ describe NlgXmlRealiserBuilder do
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '11.000')
@@ -291,7 +291,7 @@ describe NlgXmlRealiserBuilder do
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '81000')
@@ -301,7 +301,7 @@ describe NlgXmlRealiserBuilder do
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '81,000')
@@ -311,7 +311,7 @@ describe NlgXmlRealiserBuilder do
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '8%')
@@ -321,7 +321,7 @@ describe NlgXmlRealiserBuilder do
               }
             }
           }
-          doc(:child, cat: 'LIST_ITEM') {
+          item {
             cp(:child, conj: 'but') {
               np(:coord, ['a', 'thing']) {
                 str(:preMod, '8432425')
@@ -336,14 +336,14 @@ describe NlgXmlRealiserBuilder do
       record("punctuation problem 1") {
         doc {
           sp(:child) {
-            np(:subj, 'there', cat: 'ADVERB')
-            vp(:vp, 'be') {
-              np(:compl, ['an', 'in-stent restenosis']) {
-                str(:preMod, '80 %')
+            subj(:np, 'there', cat: 'ADVERB')
+            verb('be') {
+              compl(:np, ['an', 'in-stent restenosis']) {
+                preMod(:str, '80 %')
               }
-              pp(:postMod, 'in') {
-                np(:compl, ['the', 'right coronary artery']) {
-                  adj(:preMod, 'proximal')
+              postMod(:pp, 'in') {
+                compl(:np, ['the', 'right coronary artery']) {
+                  preMod(:adj, 'proximal')
                 }
               }
             }
@@ -407,14 +407,14 @@ describe NlgXmlRealiserBuilder do
 <?xml version="1.0"?>
 <NLGSpec xmlns="http://simplenlg.googlecode.com/svn/trunk/res/xml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Recording>
-    <Record>
+    <Record name="Hello World">
       <Document cat="PARAGRAPH">
         <child xsi:type="StringElement">
           <val>Hello World</val>
         </child>
       </Document>
     </Record>
-    <Record>
+    <Record name="Lexical and spelling variants">
       <Document cat="PARAGRAPH">
         <child xsi:type="SPhraseSpec">
           <subj xsi:type="NPPhraseSpec">
@@ -484,7 +484,7 @@ describe NlgXmlRealiserBuilder do
         </child>
       </Document>
     </Record>
-    <Record>
+    <Record name="aAn8Test">
       <Document cat="LIST">
         <child xsi:type="DocumentElement" cat="LIST_ITEM">
           <child xsi:type="CoordinatedPhraseElement" conj="but">
@@ -748,7 +748,7 @@ describe NlgXmlRealiserBuilder do
         </child>
       </Document>
     </Record>
-    <Record>
+    <Record name="punctuation problem 1">
       <Document cat="PARAGRAPH">
         <child xsi:type="SPhraseSpec">
           <subj xsi:type="NPPhraseSpec">
@@ -793,7 +793,7 @@ describe NlgXmlRealiserBuilder do
         </child>
       </Document>
     </Record>
-    <Record>
+    <Record name="punctuation problem 2">
       <Document cat="PARAGRAPH">
         <child xsi:type="SPhraseSpec">
           <subj xsi:type="NPPhraseSpec">
@@ -843,7 +843,7 @@ describe NlgXmlRealiserBuilder do
         </child>
       </Document>
     </Record>
-    <Record>
+    <Record name="whitespace problem">
       <Document cat="PARAGRAPH">
         <child xsi:type="SPhraseSpec">
           <subj xsi:type="NPPhraseSpec">
@@ -880,7 +880,7 @@ describe NlgXmlRealiserBuilder do
         </child>
       </Document>
     </Record>
-    <Record>
+    <Record name="whitespace at end of list item">
       <Document cat="LIST">
         <child xsi:type="DocumentElement" cat="LIST_ITEM">
           <child xsi:type="DocumentElement" cat="SENTENCE">

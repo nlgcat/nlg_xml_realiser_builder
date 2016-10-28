@@ -6,6 +6,8 @@ module NlgXmlRealiserBuilder
       'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'}.freeze
 
+    SPEC_METHODS = %i(sp np vp adj adv cp pp str)
+
     DOCUMENT_CATEGORIES = %w(DOCUMENT
         SECTION
         PARAGRAPH
@@ -30,13 +32,13 @@ module NlgXmlRealiserBuilder
     DOCUMENTELEMENT_ELEMENTS       = %i(child).freeze
     SPHRASESPEC_ELEMENTS           = %i(cuePhrase subj vp).freeze
     PHRASE_ELEMENTS                = %i(frontMod preMod compl postMod head).freeze
+    COORDINATEDPHRASEELEMENT_ELEMENTS = %i(coord).freeze
 
     VPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS
     NPPHRASESPEC_ELEMENTS          = ( PHRASE_ELEMENTS + [ :spec ] ).freeze
     ADJPHRASESPEC_ELEMENTS         = PHRASE_ELEMENTS
     ADVPHRASESPEC_ELEMENTS         = PHRASE_ELEMENTS
     PPPHRASESPEC_ELEMENTS          = PHRASE_ELEMENTS
-    COORDINATEDPHRASEELEMENT_ELEMENTS = [ :coord ].freeze
 
     # What attributes does each phrase spec type accepts
 

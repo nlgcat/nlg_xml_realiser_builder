@@ -1,12 +1,20 @@
 # frozen_string_literal: true
 module NlgXmlRealiserBuilder
   module PrimitiveOperations
-    def builder(&block)
+    def builder(simple = false, &block)
       Nokogiri::XML::Builder.new do |xml|
         @xml = xml
         xml.NLGSpec(Consts::XML_SCHEMA) {
           xml.Recording {
-            instance_eval(&block) if block
+            if simple
+              record {
+                doc {
+                  instance_eval(&block) if block
+                }
+              }
+            else
+              instance_eval(&block) if block
+            end
           }
         }
       end
@@ -14,7 +22,7 @@ module NlgXmlRealiserBuilder
 
     def record(name = nil, &block)
       attributes = {}
-      attributes.merge(name: name) if name
+      attributes.merge!(name: name) if name
       @xml.Record(attributes) {
         instance_eval(&block) if block
       }
@@ -29,20 +37,18 @@ module NlgXmlRealiserBuilder
       attributes.merge!('xsi:type' => 'DocumentElement') unless tag == :Document
       attributes.merge!('cat' => category)
       @xml.send(tag, attributes) {
-        previous_call, @last_call = @last_call, 'DocumentElement'
-        instance_eval(&block) if block
-        @last_call = previous_call
+        nlg_eval('DocumentElement', &block)
       }
     end
 
-    def str(tag = :compl, val = nil)
+    def str(tag = :compl, val = nil, options = nil, &block)
       return unless val
       @xml.send(tag, 'xsi:type' => 'StringElement') {
         @xml.val val.to_s
       }
     end
 
-    private def head(base, cat = 'NOUN')
+    def head(base, cat = 'NOUN')
       unless Consts::NLG_LEXICAL_CATEGORY.include?(cat)
         raise "Head category '#{cat}' is not in [#{Consts::NLG_LEXICAL_CATEGORY.join(", ")}]"
       end
@@ -51,13 +57,22 @@ module NlgXmlRealiserBuilder
       }
     end
 
-    private def spec(base, cat = 'DETERMINER')
+    def spec(base, cat = 'DETERMINER')
       unless Consts::NLG_LEXICAL_CATEGORY.include?(cat)
         raise "Specifier category must be in [#{Consts::NLG_LEXICAL_CATEGORY.join(", ")}]"
       end
       @xml.spec_('xsi:type' => 'WordElement', 'cat' => cat) {
         @xml.base base
       }
+    end
+
+    private def nlg_eval(spec_type, &block)
+      begin
+        previous_call, @last_call = @last_call, spec_type
+        instance_eval(&block) if block
+      ensure
+        @last_call = previous_call
+      end
     end
 
     private def validate_element!(tag)
@@ -73,6 +88,14 @@ module NlgXmlRealiserBuilder
       end
     end
 
+    private def is_attribute_valid?(value, validation)
+      if validation.is_a? Array
+        validation.include? value
+      else
+        value.is_a? validation
+      end
+    end
+
     private def validate_attributes!(options = {}, spec_type)
       valid_attributes   = Consts.const_get("#{spec_type.upcase}_ATTRIBUTES")
       invalid_attributes = options.keys - valid_attributes
@@ -82,14 +105,8 @@ module NlgXmlRealiserBuilder
 
       results = []
       options.keys.each do |key|
-        valid = if Consts::ATTRIBUTES[key].is_a? Array
-                  Consts::ATTRIBUTES[key].include? options[key]
-                else
-                  options[key].is_a? Consts::ATTRIBUTES[key]
-                end
-        unless valid
-          results << "Attribute #{key} with value '#{options[key]}' should be in [#{ATTRIBUTES[key].join(", ")}]"
-        end
+        next if is_attribute_valid? options[key], Consts::ATTRIBUTES[key]
+        results << "Attribute #{key} with value '#{options[key]}' should be in [#{ATTRIBUTES[key].join(", ")}]"
       end
 
       unless results.empty?
@@ -108,9 +125,7 @@ module NlgXmlRealiserBuilder
       @xml.send(tag, attributes) {
         yield if block_given?
 
-        previous_call, @last_call = @last_call, spec_type
-        instance_eval(&block) if block
-        @last_call = previous_call
+        nlg_eval(spec_type, &block)
       }
     end
   end

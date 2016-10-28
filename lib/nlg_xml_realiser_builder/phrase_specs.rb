@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module NlgXmlRealiserBuilder
   module PhraseSpecs
+    SPEC_METHODS = %i(sp np vp adj adv cp pp)
+
     def sp(tag = :child, options = {}, &block)
       abstract_spec('SPhraseSpec', tag, options, block)
     end
